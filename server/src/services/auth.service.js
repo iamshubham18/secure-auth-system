@@ -11,6 +11,7 @@ import {
   findUserByEmail,
   findUserById,
   createUser,
+  createRefreshToken,
 } from '../repositories/user.repository.js';
 
 // ==========================
@@ -49,6 +50,13 @@ const registerUser = async (userData) => {
 // ==========================
 // Login User
 // ==========================
+
+const getRefreshTokenExpiry = () => {
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+  return expiresAt;
+};
+
 const loginUser = async (loginData) => {
   const { email, password } = loginData;
 
@@ -78,6 +86,13 @@ const loginUser = async (loginData) => {
   // Generate JWT tokens
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
+
+  // Save refresh token in database
+await createRefreshToken({
+  token: refreshToken,
+  expiresAt: getRefreshTokenExpiry(),
+  userId: user.id,
+});
 
   // Remove passwordHash before returning
   const { passwordHash: _, ...safeUser } = user;
