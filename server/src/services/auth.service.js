@@ -9,6 +9,7 @@ import {
 
 import {
   findUserByEmail,
+  findUserById,
   createUser,
 } from '../repositories/user.repository.js';
 
@@ -88,7 +89,27 @@ const loginUser = async (loginData) => {
   };
 };
 
+// ==========================
+// Get Current User
+// ==========================
+const getCurrentUser = async (userId) => {
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new ApiError(
+      HTTP_STATUS.NOT_FOUND,
+      'User not found'
+    );
+  }
+
+  // Remove passwordHash before returning
+  const { passwordHash: _, ...safeUser } = user;
+
+  return safeUser;
+};
+
 export {
   registerUser,
   loginUser,
+  getCurrentUser,
 };

@@ -5,10 +5,11 @@ import asyncHandler from '../utils/asyncHandler.js';
 import {
   registerUser,
   loginUser,
+  getCurrentUser,
 } from '../services/auth.service.js';
 
 // ==========================
-// Register Controller
+// Register
 // ==========================
 const register = asyncHandler(async (req, res) => {
   const user = await registerUser(req.validatedData);
@@ -23,7 +24,7 @@ const register = asyncHandler(async (req, res) => {
 });
 
 // ==========================
-// Login Controller
+// Login
 // ==========================
 const login = asyncHandler(async (req, res) => {
   const result = await loginUser(req.validatedData);
@@ -37,7 +38,23 @@ const login = asyncHandler(async (req, res) => {
   );
 });
 
+// ==========================
+// Get Current User
+// ==========================
+const getMe = asyncHandler(async (req, res) => {
+  const user = await getCurrentUser(req.user.userId);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      'User profile fetched successfully',
+      user
+    )
+  );
+});
+
 export {
   register,
   login,
+  getMe,
 };
