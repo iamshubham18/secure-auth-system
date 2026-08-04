@@ -6,11 +6,14 @@ import cookieParser from 'cookie-parser';
 import routes from './routes/index.js';
 import notFound from './middleware/notFound.middleware.js';
 import errorHandler from './middleware/error.middleware.js';
+import healthRoutes from './routes/health.routes.js';
 
 const app = express();
 
 // Security Middleware
 app.use(helmet());
+// health check route
+app.use('/health', healthRoutes);
 
 // CORS
 app.use(
