@@ -6,7 +6,8 @@ import {
   registerUser,
   loginUser,
   getCurrentUser,
-  refreshAccessToken
+  refreshAccessToken,
+  logoutUser
 } from '../services/auth.service.js';
 
 // ==========================
@@ -71,9 +72,26 @@ const refresh = asyncHandler(async (req, res) => {
   );
 });
 
+// ==========================
+// Logout User
+// ==========================
+const logout = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.validatedData;
+
+  await logoutUser(refreshToken);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      'Logged out successfully'
+    )
+  );
+});
+
 export {
   register,
   login,
   getMe,
   refresh,
+  logout
 };

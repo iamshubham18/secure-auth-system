@@ -14,6 +14,7 @@ import {
   login,
   getMe,
   refresh,
+  logout
 } from '../controllers/auth.controller.js';
 
 const router = express.Router();
@@ -34,6 +35,12 @@ router.post(
   '/refresh',
   validate(refreshTokenSchema),
   refresh
+);
+
+router.post(
+  '/logout',
+  validate(refreshTokenSchema),
+  logout
 );
 
 router.get(

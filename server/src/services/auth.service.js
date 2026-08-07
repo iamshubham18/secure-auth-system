@@ -13,6 +13,7 @@ import {
   createUser,
   createRefreshToken,
   findRefreshToken,
+  deleteRefreshToken,
 } from '../repositories/user.repository.js';
 
 // ==========================
@@ -168,9 +169,30 @@ const refreshAccessToken = async (refreshToken) => {
   };
 };
 
+// ==========================
+// Logout User
+// ==========================
+const logoutUser = async (refreshToken) => {
+  const storedToken = await findRefreshToken(refreshToken);
+
+  if (!storedToken) {
+    throw new ApiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      'Invalid refresh token'
+    );
+  }
+
+  await deleteRefreshToken(refreshToken);
+
+  return {
+    message: 'Logged out successfully',
+  };
+};
+
 export {
   registerUser,
   loginUser,
   getCurrentUser,
   refreshAccessToken,
+  logoutUser,
 };
