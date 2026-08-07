@@ -77,6 +77,39 @@ const deleteEmailVerificationToken = async (token) => {
   });
 };
 
+const createPasswordResetToken = async (tokenData) => {
+  return await prisma.passwordResetToken.create({
+    data: tokenData,
+  });
+};
+
+const findPasswordResetToken = async (token) => {
+  return await prisma.passwordResetToken.findUnique({
+    where: {
+      token,
+    },
+  });
+};
+
+const updateUserPassword = async (userId, passwordHash) => {
+  return await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      passwordHash,
+    },
+  });
+};
+
+const deletePasswordResetToken = async (token) => {
+  return await prisma.passwordResetToken.delete({
+    where: {
+      token,
+    },
+  });
+};
+
 export {
   findUserByEmail,
   findUserById,
@@ -88,4 +121,8 @@ export {
   findEmailVerificationToken,
   markUserAsVerified,
   deleteEmailVerificationToken,
+  createPasswordResetToken,
+  findPasswordResetToken,
+  updateUserPassword,
+  deletePasswordResetToken,
 };

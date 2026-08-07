@@ -9,6 +9,8 @@ import {
   refreshAccessToken,
   logoutUser,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
 } from '../services/auth.service.js';
 
 // ==========================
@@ -106,6 +108,40 @@ const verifyEmailController = asyncHandler(async (req, res) => {
   );
 });
 
+// ==========================
+// Forgot Password
+// ==========================
+const forgotPasswordController = asyncHandler(async (req, res) => {
+  const { email } = req.validatedData;
+
+  const result = await forgotPassword(email);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      'Password reset token generated successfully',
+      result
+    )
+  );
+});
+
+// ==========================
+// Reset Password
+// ==========================
+const resetPasswordController = asyncHandler(async (req, res) => {
+  const { token, password } = req.validatedData;
+
+  const result = await resetPassword(token, password);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      'Password reset successfully',
+      result
+    )
+  );
+});
+
 export {
   register,
   login,
@@ -113,4 +149,6 @@ export {
   refresh,
   logout,
   verifyEmailController,
+  forgotPasswordController,
+  resetPasswordController,
 };

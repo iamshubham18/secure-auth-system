@@ -8,6 +8,8 @@ import {
   loginSchema,
   refreshTokenSchema,
   verifyEmailSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '../schemas/auth.schema.js';
 
 import {
@@ -17,6 +19,8 @@ import {
   refresh,
   logout,
   verifyEmailController,
+  forgotPasswordController,
+  resetPasswordController,
 } from '../controllers/auth.controller.js';
 
 const router = express.Router();
@@ -49,6 +53,18 @@ router.post(
   '/verify-email',
   validate(verifyEmailSchema),
   verifyEmailController
+);
+
+router.post(
+  '/forgot-password',
+  validate(forgotPasswordSchema),
+  forgotPasswordController
+);
+
+router.post(
+  '/reset-password',
+  validate(resetPasswordSchema),
+  resetPasswordController
 );
 
 router.get(

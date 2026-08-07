@@ -19,6 +19,10 @@ import {
   findEmailVerificationToken,
   markUserAsVerified,
   deleteEmailVerificationToken,
+  createPasswordResetToken,
+  findPasswordResetToken,
+  updateUserPassword,
+  deletePasswordResetToken,
 } from '../repositories/user.repository.js';
 
 // ==========================
@@ -247,6 +251,79 @@ const verifyEmail = async (token) => {
   };
 };
 
+// ==========================
+// Forgot Password
+// ==========================
+const forgotPassword = async (email) => {
+  const user = await findUserByEmail(email);
+
+  if (!user) {
+    throw new ApiError(
+      HTTP_STATUS.NOT_FOUND,
+      'User not found'
+    );
+  }
+
+  const resetToken = generateRandomToken();
+
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 1);
+
+  await createPasswordResetToken({
+    token: resetToken,
+    expiresAt,
+    userId: user.id,
+  });
+
+  console.log('===================================');
+  console.log('Password Reset Token');
+  console.log(resetToken);
+  console.log('===================================');
+
+  return {
+    message: 'Password reset token generated successfully',
+  };
+};
+
+// ==========================
+// Reset Password
+// ==========================
+const resetPassword = async (token, newPassword) => {
+  // Find reset token
+  const passwordResetToken = await findPasswordResetToken(token);
+
+  if (!passwordResetToken) {
+    throw new ApiError(
+      HTTP_STATUS.BAD_REQUEST,
+      'Invalid password reset token'
+    );
+  }
+
+  // Check expiration
+  if (passwordResetToken.expiresAt < new Date()) {
+    throw new ApiError(
+      HTTP_STATUS.BAD_REQUEST,
+      'Password reset token has expired'
+    );
+  }
+
+  // Hash new password
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+
+  // Update user's password
+  await updateUserPassword(
+    passwordResetToken.userId,
+    passwordHash
+  );
+
+  // Delete reset token
+  await deletePasswordResetToken(token);
+
+  return {
+    message: 'Password reset successfully',
+  };
+};
+
 export {
   registerUser,
   loginUser,
@@ -254,4 +331,6 @@ export {
   refreshAccessToken,
   logoutUser,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
 };
