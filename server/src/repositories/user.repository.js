@@ -44,6 +44,39 @@ const deleteRefreshToken = async (token) => {
   });
 };
 
+const createEmailVerificationToken = async (tokenData) => {
+  return await prisma.emailVerificationToken.create({
+    data: tokenData,
+  });
+};
+
+const findEmailVerificationToken = async (token) => {
+  return await prisma.emailVerificationToken.findUnique({
+    where: {
+      token,
+    },
+  });
+};
+
+const markUserAsVerified = async (userId) => {
+  return await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isEmailVerified: true,
+    },
+  });
+};
+
+const deleteEmailVerificationToken = async (token) => {
+  return await prisma.emailVerificationToken.delete({
+    where: {
+      token,
+    },
+  });
+};
+
 export {
   findUserByEmail,
   findUserById,
@@ -51,4 +84,8 @@ export {
   createRefreshToken,
   findRefreshToken,
   deleteRefreshToken,
+  createEmailVerificationToken,
+  findEmailVerificationToken,
+  markUserAsVerified,
+  deleteEmailVerificationToken,
 };

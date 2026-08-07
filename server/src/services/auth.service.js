@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 
 import ApiError from '../utils/ApiError.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
+import { generateRandomToken } from '../utils/token.js';
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -14,6 +15,7 @@ import {
   createRefreshToken,
   findRefreshToken,
   deleteRefreshToken,
+  createEmailVerificationToken
 } from '../repositories/user.repository.js';
 
 // ==========================
@@ -42,6 +44,26 @@ const registerUser = async (userData) => {
     email,
     passwordHash,
   });
+
+  // Generate email verification token
+  const verificationToken = generateRandomToken();
+
+  // Token expires in 24 hours
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24);
+
+  // Save verification token
+  await createEmailVerificationToken({
+    token: verificationToken,
+    expiresAt,
+    userId: user.id,
+  });
+
+  // Temporary: Print token to console
+  console.log('===================================');
+  console.log('Email Verification Token');
+  console.log(verificationToken);
+  console.log('===================================');
 
   // Remove passwordHash before returning
   const { passwordHash: _, ...safeUser } = user;
