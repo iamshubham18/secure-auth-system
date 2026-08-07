@@ -28,9 +28,27 @@ const createRefreshToken = async (tokenData) => {
   });
 };
 
+const findRefreshToken = async (token) => {
+  return await prisma.refreshToken.findUnique({
+    where: {
+      token,
+    },
+  });
+};
+
+const deleteRefreshToken = async (token) => {
+  return await prisma.refreshToken.delete({
+    where: {
+      token,
+    },
+  });
+};
+
 export {
   findUserByEmail,
   findUserById,
   createUser,
   createRefreshToken,
+  findRefreshToken,
+  deleteRefreshToken,
 };

@@ -6,6 +6,7 @@ import {
   registerUser,
   loginUser,
   getCurrentUser,
+  refreshAccessToken
 } from '../services/auth.service.js';
 
 // ==========================
@@ -53,8 +54,26 @@ const getMe = asyncHandler(async (req, res) => {
   );
 });
 
+// ==========================
+// Refresh Access Token
+// ==========================
+const refresh = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.validatedData;
+
+  const result = await refreshAccessToken(refreshToken);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      'Access token refreshed successfully',
+      result
+    )
+  );
+});
+
 export {
   register,
   login,
   getMe,
+  refresh,
 };

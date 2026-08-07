@@ -12,6 +12,7 @@ import {
   findUserById,
   createUser,
   createRefreshToken,
+  findRefreshToken,
 } from '../repositories/user.repository.js';
 
 // ==========================
@@ -123,8 +124,53 @@ const getCurrentUser = async (userId) => {
   return safeUser;
 };
 
+// ==========================
+// Refresh Access Token
+// ==========================
+const refreshAccessToken = async (refreshToken) => {
+  // Check if refresh token exists in database
+  const storedToken = await findRefreshToken(refreshToken);
+
+  if (!storedToken) {
+    throw new ApiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      'Invalid refresh token'
+    );
+  }
+
+  // Check if refresh token has expired
+  if (storedToken.expiresAt < new Date()) {
+    throw new ApiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      'Refresh token has expired'
+    );
+  }
+
+  // ==========================
+// Find User and Generate New Access Token
+// ==========================
+
+  // Find user
+  const user = await findUserById(storedToken.userId);
+
+  if (!user) {
+    throw new ApiError(
+      HTTP_STATUS.NOT_FOUND,
+      'User not found'
+    );
+  }
+
+  // Generate new access token
+  const accessToken = generateAccessToken(user);
+
+  return {
+    accessToken,
+  };
+};
+
 export {
   registerUser,
   loginUser,
   getCurrentUser,
+  refreshAccessToken,
 };
