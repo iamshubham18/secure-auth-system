@@ -15,7 +15,10 @@ import {
   createRefreshToken,
   findRefreshToken,
   deleteRefreshToken,
-  createEmailVerificationToken
+  createEmailVerificationToken,
+  findEmailVerificationToken,
+  markUserAsVerified,
+  deleteEmailVerificationToken,
 } from '../repositories/user.repository.js';
 
 // ==========================
@@ -211,10 +214,44 @@ const logoutUser = async (refreshToken) => {
   };
 };
 
+// ==========================
+// Verify Email
+// ==========================
+const verifyEmail = async (token) => {
+  // Find verification token
+  const verificationToken = await findEmailVerificationToken(token);
+
+  if (!verificationToken) {
+    throw new ApiError(
+      HTTP_STATUS.BAD_REQUEST,
+      'Invalid verification token'
+    );
+  }
+
+  // Check expiration
+  if (verificationToken.expiresAt < new Date()) {
+    throw new ApiError(
+      HTTP_STATUS.BAD_REQUEST,
+      'Verification token has expired'
+    );
+  }
+
+  // Mark user as verified
+  await markUserAsVerified(verificationToken.userId);
+
+  // Delete token so it cannot be reused
+  await deleteEmailVerificationToken(token);
+
+  return {
+    message: 'Email verified successfully',
+  };
+};
+
 export {
   registerUser,
   loginUser,
   getCurrentUser,
   refreshAccessToken,
   logoutUser,
+  verifyEmail,
 };

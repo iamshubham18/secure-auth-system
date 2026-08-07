@@ -7,6 +7,7 @@ import {
   registerSchema,
   loginSchema,
   refreshTokenSchema,
+  verifyEmailSchema,
 } from '../schemas/auth.schema.js';
 
 import {
@@ -14,7 +15,8 @@ import {
   login,
   getMe,
   refresh,
-  logout
+  logout,
+  verifyEmailController,
 } from '../controllers/auth.controller.js';
 
 const router = express.Router();
@@ -41,6 +43,12 @@ router.post(
   '/logout',
   validate(refreshTokenSchema),
   logout
+);
+
+router.post(
+  '/verify-email',
+  validate(verifyEmailSchema),
+  verifyEmailController
 );
 
 router.get(

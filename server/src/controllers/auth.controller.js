@@ -7,7 +7,8 @@ import {
   loginUser,
   getCurrentUser,
   refreshAccessToken,
-  logoutUser
+  logoutUser,
+  verifyEmail,
 } from '../services/auth.service.js';
 
 // ==========================
@@ -88,10 +89,28 @@ const logout = asyncHandler(async (req, res) => {
   );
 });
 
+// ==========================
+// Verify Email
+// ==========================
+const verifyEmailController = asyncHandler(async (req, res) => {
+  const { token } = req.validatedData;
+
+  const result = await verifyEmail(token);
+
+  return res.status(HTTP_STATUS.OK).json(
+    new ApiResponse(
+      HTTP_STATUS.OK,
+      'Email verified successfully',
+      result
+    )
+  );
+});
+
 export {
   register,
   login,
   getMe,
   refresh,
-  logout
+  logout,
+  verifyEmailController,
 };

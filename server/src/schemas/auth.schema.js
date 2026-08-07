@@ -47,3 +47,10 @@ export const refreshTokenSchema = z.object({
     .trim()
     .min(1, 'Refresh token is required'),
 });
+
+export const verifyEmailSchema = z.object({
+  token: z
+    .string()
+    .trim()
+    .min(1, 'Verification token is required'),
+});
