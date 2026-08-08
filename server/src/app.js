@@ -12,7 +12,8 @@ const app = express();
 
 // Security Middleware
 app.use(helmet());
-// health check route
+
+// Health check route
 app.use('/health', healthRoutes);
 
 // CORS
