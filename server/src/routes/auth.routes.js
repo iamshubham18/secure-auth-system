@@ -2,6 +2,7 @@ import express from 'express';
 
 import validate from '../middleware/validate.middleware.js';
 import authenticate from '../middleware/auth.middleware.js';
+import authRateLimiter from '../middleware/rateLimit.middleware.js';
 
 import {
   registerSchema,
@@ -33,6 +34,7 @@ router.post(
 
 router.post(
   '/login',
+  authRateLimiter,
   validate(loginSchema),
   login
 );
@@ -57,12 +59,14 @@ router.post(
 
 router.post(
   '/forgot-password',
+  authRateLimiter,
   validate(forgotPasswordSchema),
   forgotPasswordController
 );
 
 router.post(
   '/reset-password',
+  authRateLimiter,
   validate(resetPasswordSchema),
   resetPasswordController
 );
