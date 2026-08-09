@@ -1,6 +1,7 @@
 import ApiResponse from '../utils/ApiResponse.js';
 import { HTTP_STATUS } from '../constants/httpStatus.js';
 import asyncHandler from '../utils/asyncHandler.js';
+import ApiError from '../utils/ApiError.js';
 
 import {
   registerUser,
@@ -34,11 +35,20 @@ const register = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
   const result = await loginUser(req.validatedData);
 
+  const { refreshToken, ...responseData } = result;
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
   return res.status(HTTP_STATUS.OK).json(
     new ApiResponse(
       HTTP_STATUS.OK,
       'Login successful',
-      result
+      responseData
     )
   );
 });
@@ -62,7 +72,14 @@ const getMe = asyncHandler(async (req, res) => {
 // Refresh Access Token
 // ==========================
 const refresh = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.validatedData;
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    throw new ApiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      'Refresh token not found'
+    );
+  }
 
   const result = await refreshAccessToken(refreshToken);
 
@@ -79,9 +96,22 @@ const refresh = asyncHandler(async (req, res) => {
 // Logout User
 // ==========================
 const logout = asyncHandler(async (req, res) => {
-  const { refreshToken } = req.validatedData;
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    throw new ApiError(
+      HTTP_STATUS.UNAUTHORIZED,
+      'Refresh token not found'
+    );
+  }
 
   await logoutUser(refreshToken);
+
+  res.clearCookie('refreshToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
 
   return res.status(HTTP_STATUS.OK).json(
     new ApiResponse(

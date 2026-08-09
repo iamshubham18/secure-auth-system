@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+// ==========================
+// Register Schema
+// ==========================
 export const registerSchema = z.object({
   firstName: z
     .string()
@@ -26,9 +29,15 @@ export const registerSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+    .regex(
+      /[^A-Za-z0-9]/,
+      'Password must contain at least one special character'
+    ),
 });
 
+// ==========================
+// Login Schema
+// ==========================
 export const loginSchema = z.object({
   email: z
     .string()
@@ -41,6 +50,18 @@ export const loginSchema = z.object({
     .min(1, 'Password is required'),
 });
 
+// ==========================
+// Refresh Schema
+// ==========================
+// Refresh token is now stored in an HttpOnly cookie,
+// so the request body does not need to contain anything.
+export const refreshSchema = z.object({});
+
+// ==========================
+// Refresh Token Schema
+// ==========================
+// Kept for logout if logout still receives
+// the refresh token through the request body.
 export const refreshTokenSchema = z.object({
   refreshToken: z
     .string()
@@ -48,6 +69,9 @@ export const refreshTokenSchema = z.object({
     .min(1, 'Refresh token is required'),
 });
 
+// ==========================
+// Verify Email Schema
+// ==========================
 export const verifyEmailSchema = z.object({
   token: z
     .string()
@@ -55,6 +79,9 @@ export const verifyEmailSchema = z.object({
     .min(1, 'Verification token is required'),
 });
 
+// ==========================
+// Forgot Password Schema
+// ==========================
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
@@ -63,6 +90,9 @@ export const forgotPasswordSchema = z.object({
     .transform((email) => email.toLowerCase()),
 });
 
+// ==========================
+// Reset Password Schema
+// ==========================
 export const resetPasswordSchema = z.object({
   token: z
     .string()
@@ -76,5 +106,8 @@ export const resetPasswordSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+    .regex(
+      /[^A-Za-z0-9]/,
+      'Password must contain at least one special character'
+    ),
 });

@@ -7,7 +7,7 @@ import authRateLimiter from '../middleware/rateLimit.middleware.js';
 import {
   registerSchema,
   loginSchema,
-  refreshTokenSchema,
+  refreshSchema,
   verifyEmailSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
@@ -26,12 +26,18 @@ import {
 
 const router = express.Router();
 
+// ==========================
+// Register
+// ==========================
 router.post(
   '/register',
   validate(registerSchema),
   register
 );
 
+// ==========================
+// Login
+// ==========================
 router.post(
   '/login',
   authRateLimiter,
@@ -39,24 +45,37 @@ router.post(
   login
 );
 
+// ==========================
+// Refresh Access Token
+// ==========================
+// Refresh token is now read from
+// the HttpOnly cookie.
 router.post(
   '/refresh',
-  validate(refreshTokenSchema),
+  validate(refreshSchema),
   refresh
 );
 
+// ==========================
+// Logout
+// ==========================
 router.post(
   '/logout',
-  validate(refreshTokenSchema),
   logout
 );
 
+// ==========================
+// Verify Email
+// ==========================
 router.post(
   '/verify-email',
   validate(verifyEmailSchema),
   verifyEmailController
 );
 
+// ==========================
+// Forgot Password
+// ==========================
 router.post(
   '/forgot-password',
   authRateLimiter,
@@ -64,6 +83,9 @@ router.post(
   forgotPasswordController
 );
 
+// ==========================
+// Reset Password
+// ==========================
 router.post(
   '/reset-password',
   authRateLimiter,
@@ -71,6 +93,9 @@ router.post(
   resetPasswordController
 );
 
+// ==========================
+// Get Current User
+// ==========================
 router.get(
   '/me',
   authenticate,
