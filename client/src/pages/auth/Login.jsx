@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../../context/useAuth';
+import AuthLayout from '../../components/auth/AuthLayout';
 
 function Login() {
   const navigate = useNavigate();
@@ -36,39 +37,66 @@ function Login() {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to your secure account"
+    >
+      <form onSubmit={handleSubmit} className="auth-form">
+        {error && (
+          <div className="auth-error">
+            {error}
+          </div>
+        )}
 
-      {error && <p>{error}</p>}
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
+          <input
+            id="email"
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-        />
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          <input
+            id="password"
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="auth-button"
+          disabled={loading}
+        >
+          {loading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
 
-      <button onClick={() => navigate('/register')}>
-        Create an account
-      </button>
-    </div>
+      <div className="auth-footer">
+        <span>Don't have an account?</span>
+
+        <button
+          type="button"
+          className="auth-link"
+          onClick={() => navigate('/register')}
+        >
+          Create account
+        </button>
+      </div>
+    </AuthLayout>
   );
 }
 
