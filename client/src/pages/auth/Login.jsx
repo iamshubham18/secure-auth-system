@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../context/useAuth';
 import AuthLayout from '../../components/auth/AuthLayout';
+import useAuth from '../../context/useAuth';
 
 function Login() {
   const navigate = useNavigate();
-  const { login, loading } = useAuth();
+ const { login, loading } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -13,6 +13,7 @@ function Login() {
   });
 
   const [error, setError] = useState('');
+  //const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -22,19 +23,34 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+  e.preventDefault();
 
-    try {
-      await login(formData.email, formData.password);
-      navigate('/dashboard');
-    } catch (error) {
+  setError('');
+
+  try {
+    await login(
+      formData.email,
+      formData.password
+    );
+
+    navigate('/dashboard');
+  } catch (error) {
+    const responseData = error.response?.data;
+
+    if (responseData?.errors?.length) {
+      const messages = responseData.errors
+        .map((item) => item.message)
+        .join(', ');
+
+      setError(messages);
+    } else {
       setError(
-        error.response?.data?.message ||
+        responseData?.message ||
         'Login failed. Please check your credentials.'
       );
     }
-  };
+  }
+};
 
   return (
     <AuthLayout
@@ -42,6 +58,7 @@ function Login() {
       subtitle="Sign in to your secure account"
     >
       <form onSubmit={handleSubmit} className="auth-form">
+
         {error && (
           <div className="auth-error">
             {error}
@@ -49,10 +66,12 @@ function Login() {
         )}
 
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="login-email">
+            Email
+          </label>
 
           <input
-            id="email"
+            id="login-email"
             type="email"
             name="email"
             placeholder="you@example.com"
@@ -63,10 +82,12 @@ function Login() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="login-password">
+            Password
+          </label>
 
           <input
-            id="password"
+            id="login-password"
             type="password"
             name="password"
             placeholder="Enter your password"
@@ -84,6 +105,16 @@ function Login() {
           {loading ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
+
+      <div className="auth-footer">
+        <button
+          type="button"
+          className="auth-link"
+          onClick={() => navigate('/forgot-password')}
+        >
+          Forgot password?
+        </button>
+      </div>
 
       <div className="auth-footer">
         <span>Don't have an account?</span>

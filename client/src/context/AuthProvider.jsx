@@ -1,11 +1,45 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../services/api';
 import AuthContext from './AuthContext';
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const refreshSession = async () => {
+    try {
+      const response = await api.post('/auth/refresh');
+
+      const { accessToken } = response.data.data;
+
+      setAccessToken(accessToken);
+
+      const userResponse = await api.get('/auth/me', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      setUser(userResponse.data.data);
+
+      return true;
+    } catch {
+  setUser(null);
+  setAccessToken(null);
+
+  return false;
+}
+  };
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      await refreshSession();
+      setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
 
   const login = async (email, password) => {
     setLoading(true);
@@ -30,9 +64,13 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    setAccessToken(null);
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } finally {
+      setUser(null);
+      setAccessToken(null);
+    }
   };
 
   const value = {
@@ -42,10 +80,8 @@ const AuthProvider = ({ children }) => {
     isAuthenticated: !!accessToken,
     login,
     logout,
+    refreshSession,
   };
-
-  // TEMPORARY DEBUG LOG
-  console.log('AUTH PROVIDER RENDERED', value);
 
   return (
     <AuthContext.Provider value={value}>
